@@ -3,20 +3,22 @@ name: Build and Tests
 on:
   pull_request:
   push:
+    branches: [main, dev]
     paths-ignore: [.gitignore, LICENSE, README.md]
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
-  group: ${{ github.repository }}-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
   build:
-    timeout-minutes: 30
-    name: ${{ matrix.plat }} (${{ matrix.os }}, ${{ matrix.arch }}, ${{ matrix.toolchain }}, ${{ matrix.mode }})
+    name: ${{ join(matrix.*, ', ') }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    permissions:
+      contents: read # Only needed for private repos.
     strategy:
       fail-fast: false
       matrix:
@@ -31,10 +33,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup xmake
-        uses: xmake-io/github-action-setup-xmake@v1
+        uses: xmake-io/github-action-setup-xmake@3a1a5dddfc7fa625d9a698738334bf55655a861a # v1.2.5
         with:
           xmake-version: branch@master
           actions-cache-folder: .xmake-cache
