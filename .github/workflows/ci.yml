@@ -2,8 +2,7 @@ name: Build and Tests
 
 on:
   pull_request:
-  push:
-    branches: [main, dev]
+    branches: [main]
     paths-ignore: [.gitignore, LICENSE, README.md]
 
 permissions: {}
