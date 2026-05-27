@@ -17,7 +17,7 @@ package("oklibs", function()
     add_configs("use_std_module", {description = "Use std module instead of includes (requires `use_modules`).", default = true, type = "boolean"})
     add_configs("test_link_main", {description = "Provide a main function in a separate source file.", default = true, type = "boolean"})
     add_configs("test_max_nested", {description = "Maximum nesting level for test cases and sections.", default = "8", type = "string"})
-    add_configs("assert_color_mode", {description = "Color output mode for assertion messages.", default = "auto", values = {"auto", "always", "never"}, type = "string"})
+    add_configs("assert_color_mode", {description = "Color output mode for assertion messages.", default = "detect", values = {"detect", "always", "never"}, type = "string"})
 
     on_install("windows", "linux", "macosx", "android", "iphoneos", "wasm", "cross", function(package)
         local configs = {
@@ -25,15 +25,14 @@ package("oklibs", function()
             with_exceptions = package:config("with_exceptions"),
             use_modules = package:config("use_modules"),
             use_std_module = package:config("use_std_module"),
-            link_main = package:config("test_link_main"),
-            max_nested = package:config("test_max_nested"),
+            test_link_main = package:config("test_link_main"),
+            test_max_nested = package:config("test_max_nested"),
             assert_color_mode = package:config("assert_color_mode")
         }
 
         local targets = {}
         for name, _ in pairs(libraries) do
             if package:config(name) then
-                configs[name] = true
                 table.insert(targets, name)
             end
         end
@@ -41,7 +40,9 @@ package("oklibs", function()
             table.join2(targets, libraries)
         end
 
-        import("package.tools.xmake").install(package, configs, {targets = targets})
+        for _, target in ipairs(targets) do
+            import("package.tools.xmake").install(package, configs, {target = target})
+        end
     end)
 
     on_test(function(package)
