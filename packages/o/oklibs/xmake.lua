@@ -7,7 +7,7 @@ package("oklibs", function()
     add_urls("https://github.com/oklibs/oklibs.git")
     add_deps("fmt >=12.0.0")
 
-    local libraries = {"okutils", "okbitflag", "okassert", "oktest"}
+    local libraries = {"okbase", "okutils", "okbitflag", "okassert", "oktest"}
     for _, name in ipairs(libraries) do
         add_configs(name, {description = "Enable " .. name .. ".", default = nil, type = "boolean"})
     end
